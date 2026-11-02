@@ -1,6 +1,6 @@
 import uuid
+import datetime
 
-from datetime import datetime
 from collections.abc import AsyncGenerator
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, relationship
@@ -23,16 +23,18 @@ class Post(DCBase):
     url = Column(String, nullable=False)
     file_type = Column(String, nullable=False)
     file_name = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.now(datetime.timetzone.utc))
+    created_at = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc))
 
 
 engine = create_async_engine(DATABASE_URL)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
+
 # Create DB & Tables
 async def create_db_and_tables():
     async with engine.begin() as conn:
         await conn.run_sync(DCBase.metadata.create_all)
+
 
 # Async Interact with DB
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
