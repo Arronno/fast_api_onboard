@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, File, UploadFile, Form, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas import PostCreate, PostResponse
 from app.database import Post, create_db_and_tables, get_async_session
@@ -12,49 +12,3 @@ async def lifespan(app: FastAPI):
 
 
 fast_app = FastAPI(lifespan=lifespan)
-
-
-text_posts = {
-    1: {"name": "t1", "content": "cool product"},
-    2: {"name": "t2", "content": "smart device"},
-    3: {"name": "t3", "content": "wireless headphones"},
-    4: {"name": "t4", "content": "gaming laptop"},
-    5: {"name": "t5", "content": "portable charger"},
-    6: {"name": "t6", "content": "mechanical keyboard"},
-    7: {"name": "t7", "content": "fitness tracker"},
-    8: {"name": "t8", "content": "bluetooth speaker"},
-    9: {"name": "t9", "content": "smartwatch"},
-    10: {"name": "t10", "content": "4K monitor"},
-}
-
-
-@fast_app.get("/")
-def landing_page():
-    return {"message": "Landing Page!"}
-
-
-@fast_app.get("/home")
-def home():
-    return {"message": "Welcome!"}
-
-
-@fast_app.get("/posts/{post_id}")
-def get_post(post_id: int) -> PostResponse:
-    if post_id not in text_posts:
-        raise HTTPException(status_code=404, detail="Post Not Found")
-    return text_posts.get(post_id)
-
-
-@fast_app.get("/posts")
-def get_all_posts(limit: int = None):
-    if limit is not None:
-        return list(text_posts.values())[:limit]
-    else:
-        return list(text_posts.values())
-
-
-@fast_app.post("/posts")
-def create_post(post: PostCreate) -> PostResponse:
-    new_post = {"name": post.name, "content": post.content}
-    text_posts[max(text_posts.keys()) + 1] = new_post
-    return new_post
