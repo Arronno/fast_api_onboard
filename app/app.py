@@ -33,12 +33,13 @@ async def upload_file(
         with tempfile.NamedTemporaryFile(
             delete=False, suffix=os.path.splitext(file.filename)[1]
         ) as temp_file:
+            # temp file only holds the content of the file with provided ext
             temp_file_path = temp_file.name
             shutil.copyfileobj(file.file, temp_file)
 
         upload_result = imagekit.files.upload(
             file=open(temp_file_path, "rb"),
-            file_name=file.filename,
+            file_name=file.filename,  # gets proper filename
             use_unique_file_name=True,
             tags=["backend-upload"],
         )
@@ -46,9 +47,7 @@ async def upload_file(
         post = Post(
             caption=caption,
             url=upload_result.url,
-            file_type="video"
-            if file.content_type.startswith("video/")
-            else "image",
+            file_type="video" if file.content_type.startswith("video/") else "image",
             file_name=upload_result.name,
         )
 
