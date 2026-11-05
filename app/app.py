@@ -74,7 +74,7 @@ async def get_feed(session: AsyncSession = Depends(get_async_session)):
     for post in posts:
         posts_data.append(
             {
-                "id": str(post.post_id),
+                "post_id": str(post.post_id),
                 "caption": post.caption,
                 "url": post.url,
                 "file_type": post.file_type,
@@ -84,3 +84,22 @@ async def get_feed(session: AsyncSession = Depends(get_async_session)):
         )
 
     return {"posts": posts_data}
+
+
+@fast_app.delete("/posts/{post_id}")
+async def delete_post(post_id: str, session: AsyncSession = Depends(get_async_session)):
+    try:
+        post_uuid = uuid.UUID(post_id)
+
+        result = await session.execute(select(Post).where(Post.post_id == post_uuid))
+        post = result.scalars().first()
+
+        if not post:
+            raise HTTPException(status_code=404, detail="Post Not Found")
+
+        await session.delete(post)
+        await session.commit()
+
+        return {"success": True, "message": f"Post [{post_id}] Deleted"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
