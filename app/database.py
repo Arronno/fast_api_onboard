@@ -7,7 +7,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, relationship
 from sqlalchemy import Column, String, Text, DateTime, ForeignKey
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from fastapi_users.db import SQLAlchemyUserDatabase, SQLAlchemyBaseOAuthAccountTableUUID
+from fastapi_users.db import SQLAlchemyUserDatabase, SQLAlchemyBaseUserTableUUID
 
 
 DATABASE_URL = "sqlite+aiosqlite:///./test.db"
@@ -17,7 +17,7 @@ class DCBase(DeclarativeBase):
     pass
 
 
-class User(SQLAlchemyBaseOAuthAccountTableUUID, DCBase):
+class User(SQLAlchemyBaseUserTableUUID, DCBase):
     posts = relationship(argument="Post", back_populates="user")
 
 
