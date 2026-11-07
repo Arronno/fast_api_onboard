@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas import PostCreate, PostResponse
 from app.database import Post, create_db_and_tables, get_async_session
 from fastapi import FastAPI, HTTPException, File, UploadFile, Form, Depends
+from app.users import auth_backend, current_active_user, fastapi_users
 
 
 @asynccontextmanager
@@ -19,6 +20,10 @@ async def lifespan(app: FastAPI):
 
 
 fast_app = FastAPI(lifespan=lifespan)
+
+fast_app.include_router(
+    fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["auth"]
+)
 
 
 @fast_app.post("/upload")
