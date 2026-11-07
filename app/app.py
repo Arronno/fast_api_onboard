@@ -7,7 +7,7 @@ from sqlalchemy import select
 from app.images import imagekit
 from contextlib import asynccontextmanager
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas import PostCreate, PostResponse
+from app.schemas import PostCreate, PostResponse, UserRead, UserCreate, UserUpdate
 from app.database import Post, create_db_and_tables, get_async_session
 from fastapi import FastAPI, HTTPException, File, UploadFile, Form, Depends
 from app.users import auth_backend, current_active_user, fastapi_users
@@ -23,6 +23,20 @@ fast_app = FastAPI(lifespan=lifespan)
 
 fast_app.include_router(
     fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["auth"]
+)
+fast_app.include_router(
+    fastapi_users.get_register_router(UserRead, UserCreate),
+    prefix="/auth",
+    tags=["auth"],
+)
+fast_app.include_router(
+    fastapi_users.get_reset_password_router(), prefix="/auth", tags=["auth"]
+)
+fast_app.include_router(
+    fastapi_users.get_verify_router(UserRead), prefix="/auth", tags=["auth"]
+)
+fast_app.include_router(
+    fastapi_users.get_users_router(UserRead, UserUpdate), prefix="/auth", tags=["auth"]
 )
 
 
